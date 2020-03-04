@@ -42,4 +42,7 @@ func main() {
 	sm.WaitVisible(b.Header(0).ByContains("text()", "Example Domain", 0).String(), 0)
 
 	sm.CreateScreenShot("done.png", 0)
+
+	//in examples.go
+	examples()
 }
