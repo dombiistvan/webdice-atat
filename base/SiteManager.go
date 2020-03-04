@@ -1,0 +1,223 @@
+package base
+
+import (
+	"context"
+	"errors"
+	"fmt"
+	"github.com/chromedp/cdproto/input"
+	"github.com/chromedp/chromedp"
+	"io/ioutil"
+	"reflect"
+	"time"
+)
+
+type SiteManager struct {
+	ctx        context.Context
+	cancel     context.CancelFunc
+	info       chromedp.Device
+	timeoutSec int64
+
+	fixActions []chromedp.Action
+}
+
+func (sm *SiteManager) Init(d chromedp.Device, defTimeoutSec int64) {
+	sm.info = d
+	sm.ctx, sm.cancel = chromedp.NewContext(context.Background())
+	sm.fixActions = append(sm.fixActions, chromedp.EmulateViewport(sm.info.Device().Width, sm.info.Device().Height))
+	sm.timeoutSec = defTimeoutSec
+}
+
+func (sm *SiteManager) GoToPath(url string, timoutSec int64) {
+	err := sm.doTimeoutContext(timoutSec, chromedp.Navigate(url))
+
+	if err != nil {
+		panic(err)
+	}
+}
+
+func (sm *SiteManager) CreateScreenShot(filename string, timeoutSec int64) {
+	var p []byte
+
+	err := sm.doTimeoutContext(timeoutSec, chromedp.CaptureScreenshot(&p))
+
+	if err != nil {
+		panic(err)
+	}
+
+	err = ioutil.WriteFile(filename, p, 0755)
+
+	if err != nil {
+		panic(err)
+	}
+}
+
+func (sm *SiteManager) Cancel() {
+	sm.cancel()
+}
+
+func (sm SiteManager) ById(path, tag, id string) string {
+	return sm.ByAttribute(path, tag, "id", id)
+}
+
+func (sm SiteManager) ByAttribute(path, tag, attributeKey, attributeValue string) string {
+	return fmt.Sprintf(`%s%s[%s="%s"]`, path, tag, attributeKey, attributeValue)
+}
+
+func (sm *SiteManager) FillFields(fields []map[string]interface{}, timeoutSec int64) {
+	var actions []chromedp.Action
+
+	for _, fd := range fields {
+		identifier, kok := fd["identifier"]
+		value, vok := fd["value"]
+		options, qok := fd["options"]
+		if kok && vok && !qok {
+			actions = append(actions, chromedp.SendKeys(identifier, value.(string)))
+		} else if kok && vok {
+			if reflect.TypeOf(options) != reflect.TypeOf([]chromedp.QueryOption{}) {
+				panic(errors.New("options must be instance of []chromedp.QueryOption"))
+			}
+			actions = append(actions, chromedp.SendKeys(identifier, value.(string), options.([]chromedp.QueryOption)...))
+		}
+	}
+
+	err := sm.doTimeoutContext(timeoutSec, actions...)
+	if err != nil {
+		panic(err)
+	}
+}
+
+func (sm *SiteManager) WaitEnabled(selector string, timeoutSec int64) {
+	err := sm.doTimeoutContext(timeoutSec, chromedp.WaitEnabled(selector))
+	if err != nil {
+		panic(err)
+	}
+}
+
+func (sm *SiteManager) WaitNotPresent(selector string, timeoutSec int64) {
+	err := sm.doTimeoutContext(timeoutSec, chromedp.WaitNotPresent(selector))
+	if err != nil {
+		panic(err)
+	}
+}
+
+func (sm *SiteManager) WaitNotVisible(selector string, timeoutSec int64) {
+	err := sm.doTimeoutContext(timeoutSec, chromedp.WaitNotVisible(selector))
+	if err != nil {
+		panic(err)
+	}
+}
+
+func (sm *SiteManager) WaitVisible(selector string, timeoutSec int64) {
+	err := sm.doTimeoutContext(timeoutSec, chromedp.WaitVisible(selector))
+	if err != nil {
+		panic(err)
+	}
+}
+
+func (sm *SiteManager) WaitSelected(selector string, timeoutSec int64) {
+	err := sm.doTimeoutContext(timeoutSec, chromedp.WaitSelected(selector))
+	if err != nil {
+		panic(err)
+	}
+}
+
+func (sm *SiteManager) WaitReady(selector string, timeoutSec int64) {
+	err := sm.doTimeoutContext(timeoutSec, chromedp.WaitReady(selector))
+	if err != nil {
+		panic(err)
+	}
+}
+
+/*func (sm *SiteManager) PressButton(selector string, timeoutSec int64 ,options... chromedp.QueryOption){
+	err := sm.doTimeoutContext(timeoutSec,chromedp.Click(selector, options...))
+	if err != nil{
+		panic(err)
+	}
+}*/
+
+func (sm *SiteManager) ClickElement(selector string, timeoutSec int64, options ...chromedp.QueryOption) {
+	err := sm.doTimeoutContext(timeoutSec, chromedp.Click(selector, options...))
+	if err != nil {
+		panic(err)
+	}
+}
+
+func (sm *SiteManager) Wait(secs int64) {
+	err := sm.doTimeoutContext(0, chromedp.Sleep(time.Second*time.Duration(secs)))
+	if err != nil {
+		panic(err)
+	}
+}
+
+func (sm *SiteManager) CustomAction(action chromedp.ActionFunc, timeoutSec int64) {
+	err := sm.doTimeoutContext(timeoutSec, action)
+	if err != nil {
+		panic(err)
+	}
+}
+
+func (sm *SiteManager) KeyDown(key string, timeoutSec int64) {
+	err := sm.doTimeoutContext(timeoutSec, input.DispatchKeyEvent(input.KeyDown).WithKey(key))
+	if err != nil {
+		panic(err)
+	}
+}
+
+func (sm *SiteManager) KeyRawDown(key string, timeoutSec int64) {
+	err := sm.doTimeoutContext(timeoutSec, input.DispatchKeyEvent(input.KeyRawDown).WithKey(key))
+	if err != nil {
+		panic(err)
+	}
+}
+
+func (sm *SiteManager) KeyUp(key string, timeoutSec int64) {
+	err := sm.doTimeoutContext(timeoutSec, input.DispatchKeyEvent(input.KeyUp).WithKey(key))
+	if err != nil {
+		panic(err)
+	}
+}
+
+func (sm *SiteManager) KeyChar(key string, timeoutSec int64) {
+	err := sm.doTimeoutContext(timeoutSec, input.DispatchKeyEvent(input.KeyChar).WithKey(key))
+	if err != nil {
+		panic(err)
+	}
+}
+
+func (sm SiteManager) getActions(actions ...chromedp.Action) []chromedp.Action {
+	return append(sm.fixActions, actions...)
+}
+
+func (sm SiteManager) GetDefaultTimeoutSecs() int64 {
+	return sm.timeoutSec
+}
+
+func (sm SiteManager) GetTimeoutDurationSecs(secs int64) time.Duration {
+	return time.Duration(secs) * time.Second
+}
+
+func (sm *SiteManager) doTimeoutContext(timeoutSec int64, action ...chromedp.Action) error {
+	if timeoutSec == 0 && sm.timeoutSec > 0 {
+		timeoutSec = sm.timeoutSec
+	}
+
+	var doCtx context.Context
+
+	if timeoutSec > 0 {
+		doCtx, _ = context.WithTimeout(sm.ctx, sm.GetTimeoutDurationSecs(timeoutSec))
+	} else {
+		doCtx = sm.ctx
+	}
+
+	err := chromedp.Run(doCtx, sm.getActions(action...)...)
+
+	if err != nil {
+		panic(err)
+	}
+
+	if doCtx.Err() != nil {
+		fmt.Println(doCtx.Err().Error())
+	}
+
+	return err
+}
