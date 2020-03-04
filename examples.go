@@ -1,8 +1,8 @@
 package main
 
 import (
+	b "./base"
 	"github.com/chromedp/chromedp/kb"
-	b "webdiceatat/base"
 )
 
 func examples() {

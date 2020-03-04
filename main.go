@@ -1,8 +1,8 @@
 package main
 
 import (
+	b "./base"
 	"github.com/chromedp/chromedp/device"
-	b "webdiceatat/base"
 )
 
 var (
