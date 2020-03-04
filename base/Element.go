@@ -86,7 +86,7 @@ func (e *Element) ByEqual(option string, value string, filterPos int) *Element {
 
 func (e Element) String() string {
 	var selector string = fmt.Sprintf("%s%s%s", e.Path(), e.Tag(), e.Filters())
-	fmt.Println(selector)
+	//fmt.Println(selector)
 	return selector
 }
 
