@@ -152,6 +152,11 @@ func (e Element) Filters() string {
 	return strings.Join(joinFilters, "")
 }
 
+func HtmlTag(tag string, tagPos int) *Element {
+	var e Element
+	return e.ByTag(tag, tagPos)
+}
+
 func Submit(tagPos int) *Element {
 	var e Element
 	return e.ByTag("submit", tagPos)
