@@ -5,7 +5,7 @@ A chromedp based interface to make easier testing websites from code
 - https://github.com/chromedp/cdproto/input
 - https://github.com/chromedp/chromedp
 - https://github.com/chromedp/chromedp/device
-##### thanks for the contributors, and look at these go libaries if you want to extend mine, or you have a similar problem you want to solve
+##### thanks to the contributors, and look at these go libaries if you want to extend mine, or you have a similar problem you want to solve
 
 With this interface package, you can use chromedp's few features implemented in, extended with some XPATH interface.
 
