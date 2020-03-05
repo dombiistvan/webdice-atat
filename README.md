@@ -44,7 +44,7 @@ You can start your own end-user test with this interface, by initializing ```Sit
  
  Lets just have an XPATH selector like: 
   - //html/body/div[contains(@class,"something")][@someAttribute="groupAttribute"][3] 
-    - The function will be ```Div(0).ByPath("//html/body/div").ByContains("@class","something",0).ByAttribute("someAttribute","groupAttribute",3)```
+    - The function will be ```Div(0).ByPath("//html/body").ByContains("@class","something",0).ByAttribute("someAttribute","groupAttribute",3)```
     The position (3) is comes in the ByAttribute, because it is after filtering the tag. If you would like to have a reverse filtering, for example ..../div[3]... you should put the position to the ```ByTag()``` function.
     
  There are 3 kind of filtering functions right now, ```ByContains(subject, value, position)```, ```ByEqual(subject, value, position)``` and ```ByAttribute(attribute, value, position)```
