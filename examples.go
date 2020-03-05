@@ -1,14 +1,14 @@
 package main
 
 import (
-	b "./base"
 	"github.com/chromedp/chromedp/kb"
+	b "github.com/dombiistvan/webdice-atat/base"
 )
 
 func examples() {
 	var sm b.SiteManager
 
-	sm.Init(PC, 3)
+	sm.Init(b.PC, 3)
 
 	defer sm.Cancel()
 
