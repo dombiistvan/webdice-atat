@@ -55,8 +55,8 @@ You can start your own end-user test with this interface, by initializing ```Sit
     
  There are 3 type of filtering function right now, ```ByContains(subject, value, position)```, ```ByEqual(subject, value, position)``` and ```ByAttribute(attribute, value, position)```
   - ByContains makes a string like htmlTag[contains(subject,value)][position only if greater than 0] -> ```.../div[contains(@id,"-list-product")][1]``` 
-  - ByEqual make a string like htmlTag[subject="value"][position only if greater than 0] -> ```.../div[text()="First Product")]``` 
-  - ByAttribute make a string like htmlTag[@attribute="value"][position only if greater than 0] -> ```.../div[@class="list-product")][1]``` 
+  - ByEqual makes a string like htmlTag[subject="value"][position only if greater than 0] -> ```.../div[text()="First Product")]``` 
+  - ByAttribute makes a string like htmlTag[@attribute="value"][position only if greater than 0] -> ```.../div[@class="list-product")][1]``` 
   
   #### NESTED XPATH SELECTORS ARE SUPPORTED ALREADY
   
