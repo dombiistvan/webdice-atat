@@ -8,6 +8,8 @@ import (
 const containsKey, equalKey, attributeKey string = "contains", "equal", "attribute"
 
 type Element struct {
+	child    *Element
+	parent   *Element
 	fromRoot bool
 	path     string
 	tag      string
@@ -26,6 +28,13 @@ type Element struct {
 	}
 	*/
 	filters map[string][]map[string]interface{}
+}
+
+func (e *Element) AddChild(child *Element) *Element {
+	e.child = child
+	e.child.parent = e
+
+	return e
 }
 
 func (e *Element) init() {
@@ -86,17 +95,19 @@ func (e *Element) ByEqual(option string, value string, filterPos int) *Element {
 
 func (e Element) String() string {
 	var selector string = fmt.Sprintf("%s%s%s", e.Path(), e.Tag(), e.Filters())
-	//fmt.Println(selector)
+
+	if e.child != nil {
+		return selector + e.child.String()
+	}
 	return selector
 }
 
 func (e *Element) Path() string {
-	if e.path == "" {
+	if e.parent == nil && e.path == "" {
 		e.path = "//"
-	}
-
-	if e.path == "//" {
 		e.fromRoot = true
+	} else if e.parent != nil && e.path == "" {
+		e.path = "/"
 	}
 
 	return e.path
@@ -105,10 +116,6 @@ func (e *Element) Path() string {
 func (e Element) Tag() string {
 	if e.tag == "" {
 		e.tag = "*"
-	}
-
-	if !e.fromRoot {
-		return "/" + e.tag + e.TagPos()
 	}
 
 	return e.tag + e.TagPos()

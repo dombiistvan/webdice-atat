@@ -52,4 +52,17 @@ You can start your own end-user test with this interface, by initializing ```Sit
   - ByEqual make a string like htmlTag[subject="value"][position only if greater than 0] -> ```.../div[text()="First Product")]``` 
   - ByAttribute make a string like htmlTag[@attribute="value"][position only if greater than 0] -> ```.../div[@class="list-product")][1]``` 
   
-  Nested Elements are not supported yet, but will be in the near future.
+  #### NESTED XPATH SELECTORS ARE SUPPORTED ALREADY
+  
+  You can now making nested XPATH selectors by calling on the parent the ```AddChild(child)``` function, and passing the children element. For example, if you want to have a selector like
+  //html/div[@class="product-list-item-container"]/div[contains(@class,"list-item")][@id="first-product"][1] you can make it by the following code: 
+```
+    base.HtmlTag("html",0).AddChild(
+        base.Div(0).ByAttribute("class","product-list-item-container",0).AddChild(
+            base.Div(0).ByContains("@class","list-item",0).ByEqual("@id","first-product",1)
+        )
+    )
+```
+  
+  
+  
