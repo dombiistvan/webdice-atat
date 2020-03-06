@@ -180,6 +180,26 @@ func Input(tagPos int) *Element {
 	return e.ByTag("input", tagPos)
 }
 
+func Radio(tagPos int, attrPos int) *Element {
+	var e Element
+	return e.ByTag("input", tagPos).ByAttribute("type", "radio", attrPos)
+}
+
+func Checkbox(tagPos int, attrPos int) *Element {
+	var e Element
+	return e.ByTag("input", tagPos).ByAttribute("type", "checkbox", attrPos)
+}
+
+func InpButton(tagPos int, attrPos int) *Element {
+	var e Element
+	return e.ByTag("input", tagPos).ByAttribute("type", "button", attrPos)
+}
+
+func InpSubmit(tagPos int, attrPos int) *Element {
+	var e Element
+	return e.ByTag("input", tagPos).ByAttribute("type", "submit", attrPos)
+}
+
 func Textarea(tagPos int) *Element {
 	var e Element
 	return e.ByTag("textarea", tagPos)
@@ -213,4 +233,311 @@ func Header3(tagPos int) *Element {
 func Header4(tagPos int) *Element {
 	var e Element
 	return e.ByTag("h4", tagPos)
+}
+
+func Header5(tagPos int) *Element {
+	var e Element
+	return e.ByTag("h5", tagPos)
+}
+
+func Header6(tagPos int) *Element {
+	var e Element
+	return e.ByTag("h6", tagPos)
+}
+
+func Anchor(tagPos int) *Element {
+	var e Element
+	return e.ByTag("a", tagPos)
+}
+
+func Body(tagPos int) *Element {
+	var e Element
+	return e.ByTag("body", tagPos)
+}
+
+func Canvas(tagPos int) *Element {
+	var e Element
+	return e.ByTag("canvas", tagPos)
+}
+
+func Caption(tagPos int) *Element {
+	var e Element
+	return e.ByTag("caption", tagPos)
+}
+
+func Center(tagPos int) *Element {
+	var e Element
+	return e.ByTag("center", tagPos)
+}
+
+func Code(tagPos int) *Element {
+	var e Element
+	return e.ByTag("code", tagPos)
+}
+
+func Colgroup(tagPos int) *Element {
+	var e Element
+	return e.ByTag("colgroup", tagPos)
+}
+
+func Data(tagPos int) *Element {
+	var e Element
+	return e.ByTag("data", tagPos)
+}
+
+func DataList(tagPos int) *Element {
+	var e Element
+	return e.ByTag("datalist", tagPos)
+}
+
+func Dd(tagPos int) *Element {
+	var e Element
+	return e.ByTag("dd", tagPos)
+}
+
+func Dt(tagPos int) *Element {
+	var e Element
+	return e.ByTag("dt", tagPos)
+}
+
+func Dl(tagPos int) *Element {
+	var e Element
+	return e.ByTag("dl", tagPos)
+}
+
+func Details(tagPos int) *Element {
+	var e Element
+	return e.ByTag("details", tagPos)
+}
+
+func Dialog(tagPos int) *Element {
+	var e Element
+	return e.ByTag("Dialog", tagPos)
+}
+
+func Dir(tagPos int) *Element {
+	var e Element
+	return e.ByTag("dir", tagPos)
+}
+
+func Em(tagPos int) *Element {
+	var e Element
+	return e.ByTag("em", tagPos)
+}
+
+func Embed(tagPos int) *Element {
+	var e Element
+	return e.ByTag("embed", tagPos)
+}
+
+func Fieldset(tagPos int) *Element {
+	var e Element
+	return e.ByTag("fieldset", tagPos)
+}
+
+func Figure(tagPos int) *Element {
+	var e Element
+	return e.ByTag("figure", tagPos)
+}
+
+func Footer(tagPos int) *Element {
+	var e Element
+	return e.ByTag("footer", tagPos)
+}
+
+func Form(tagPos int) *Element {
+	var e Element
+	return e.ByTag("form", tagPos)
+}
+
+func Frame(tagPos int) *Element {
+	var e Element
+	return e.ByTag("frame", tagPos)
+}
+
+func Frameset(tagPos int) *Element {
+	var e Element
+	return e.ByTag("frameset", tagPos)
+}
+
+func Head(tagPos int) *Element {
+	var e Element
+	return e.ByTag("head", tagPos)
+}
+
+func Hr(tagPos int) *Element {
+	var e Element
+	return e.ByTag("hr", tagPos)
+}
+
+func Br(tagPos int) *Element {
+	var e Element
+	return e.ByTag("br", tagPos)
+}
+
+func Html(tagPos int) *Element {
+	var e Element
+	return e.ByTag("html", tagPos)
+}
+
+func Link(tagPos int) *Element {
+	var e Element
+	return e.ByTag("link", tagPos)
+}
+
+func Main(tagPos int) *Element {
+	var e Element
+	return e.ByTag("main", tagPos)
+}
+
+func Map(tagPos int) *Element {
+	var e Element
+	return e.ByTag("map", tagPos)
+}
+
+func Nav(tagPos int) *Element {
+	var e Element
+	return e.ByTag("nav", tagPos)
+}
+
+func Object(tagPos int) *Element {
+	var e Element
+	return e.ByTag("object", tagPos)
+}
+
+func Optgroup(tagPos int) *Element {
+	var e Element
+	return e.ByTag("optgroup", tagPos)
+}
+
+func Option(tagPos int) *Element {
+	var e Element
+	return e.ByTag("option", tagPos)
+}
+
+func Picture(tagPos int) *Element {
+	var e Element
+	return e.ByTag("picture", tagPos)
+}
+
+func Pre(tagPos int) *Element {
+	var e Element
+	return e.ByTag("pre", tagPos)
+}
+
+func Quote(tagPos int) *Element {
+	var e Element
+	return e.ByTag("q", tagPos)
+}
+
+func Script(tagPos int) *Element {
+	var e Element
+	return e.ByTag("script", tagPos)
+}
+
+func Section(tagPos int) *Element {
+	var e Element
+	return e.ByTag("section", tagPos)
+}
+
+func Select(tagPos int) *Element {
+	var e Element
+	return e.ByTag("select", tagPos)
+}
+
+func Small(tagPos int) *Element {
+	var e Element
+	return e.ByTag("small", tagPos)
+}
+
+func Source(tagPos int) *Element {
+	var e Element
+	return e.ByTag("source", tagPos)
+}
+
+func Span(tagPos int) *Element {
+	var e Element
+	return e.ByTag("span", tagPos)
+}
+
+func Strong(tagPos int) *Element {
+	var e Element
+	return e.ByTag("strong", tagPos)
+}
+
+func Style(tagPos int) *Element {
+	var e Element
+	return e.ByTag("stly", tagPos)
+}
+
+func Svg(tagPos int) *Element {
+	var e Element
+	return e.ByTag("svg", tagPos)
+}
+
+func Table(tagPos int) *Element {
+	var e Element
+	return e.ByTag("table", tagPos)
+}
+
+func Thead(tagPos int) *Element {
+	var e Element
+	return e.ByTag("thead", tagPos)
+}
+
+func Tbody(tagPos int) *Element {
+	var e Element
+	return e.ByTag("tbody", tagPos)
+}
+
+func Tfoot(tagPos int) *Element {
+	var e Element
+	return e.ByTag("tfoot", tagPos)
+}
+
+func Tr(tagPos int) *Element {
+	var e Element
+	return e.ByTag("tr", tagPos)
+}
+
+func Td(tagPos int) *Element {
+	var e Element
+	return e.ByTag("td", tagPos)
+}
+
+func Th(tagPos int) *Element {
+	var e Element
+	return e.ByTag("th", tagPos)
+}
+
+func Title(tagPos int) *Element {
+	var e Element
+	return e.ByTag("title", tagPos)
+}
+
+func UnorderedList(tagPos int) *Element {
+	return Ul(tagPos)
+}
+
+func Ul(tagPos int) *Element {
+	var e Element
+	return e.ByTag("ul", tagPos)
+}
+
+func OrderedList(tagPos int) *Element {
+	return Ol(tagPos)
+}
+
+func Ol(tagPos int) *Element {
+	var e Element
+	return e.ByTag("ol", tagPos)
+}
+
+func ListItem(tagPos int) *Element {
+	return Li(tagPos)
+}
+
+func Li(tagPos int) *Element {
+	var e Element
+	return e.ByTag("li", tagPos)
 }
