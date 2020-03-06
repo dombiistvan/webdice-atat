@@ -8,18 +8,38 @@ import (
 const containsKey, equalKey, attributeKey string = "contains", "equal", "attribute"
 
 type Element struct {
-	child    *Element
-	parent   *Element
-	fromRoot bool
-	path     string
-	tag      string
-	tagPos   int
+	child  *Element
+	parent *Element
+	path   string
+	tag    string
+	tagPos int
 	/**
 	{
 	"contains" :
 		[
 			{
 				"target": "@valami",
+				"value": "Valami",
+				"position:1
+			}
+		],
+		...,
+	},
+	{
+	"equal" :
+		[
+			{
+				"option": "text() || @attr || . || anything gaven",
+				"value": "Valami",
+				"position:1
+			}
+		],
+		...,
+	},
+	"attribute" :
+		[
+			{
+				"attribute": "id",
 				"value": "Valami",
 				"position:1
 			}
@@ -94,19 +114,19 @@ func (e *Element) ByEqual(option string, value string, filterPos int) *Element {
 }
 
 func (e Element) String() string {
-	var selector string = fmt.Sprintf("%s%s%s", e.Path(), e.Tag(), e.Filters())
+	var selector string
+
+	selector = fmt.Sprintf("%s%s%s", e.Path(), e.Tag(), e.Filters())
 
 	if e.child != nil {
-		return selector + e.child.String()
+		selector += "/" + e.child.String()
 	}
+
 	return selector
 }
 
 func (e *Element) Path() string {
 	if e.parent == nil && e.path == "" {
-		e.path = "//"
-		e.fromRoot = true
-	} else if e.parent != nil && e.path == "" {
 		e.path = "/"
 	}
 
