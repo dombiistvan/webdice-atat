@@ -180,6 +180,65 @@ func (sm *SiteManager) CustomAction(action chromedp.ActionFunc, timeoutSec int64
 	}
 }
 
+func (sm *SiteManager) FocusElement(selector string, timeoutSec int64, options ...chromedp.QueryOption) {
+	err := sm.doTimeoutContext(timeoutSec, chromedp.Focus(selector, options...))
+	if err != nil {
+		panic(err)
+	}
+}
+
+func (sm *SiteManager) ClearElement(selector string, timeoutSec int64, options ...chromedp.QueryOption) {
+	err := sm.doTimeoutContext(timeoutSec, chromedp.Clear(selector, options...))
+	if err != nil {
+		panic(err)
+	}
+}
+
+func (sm *SiteManager) DoubleClickElement(selector string, timeoutSec int64, options ...chromedp.QueryOption) {
+	err := sm.doTimeoutContext(timeoutSec, chromedp.DoubleClick(selector, options...))
+	if err != nil {
+		panic(err)
+	}
+}
+
+func (sm *SiteManager) SetInnerHtml(selector string, timeoutSec int64, html *string) {
+	err := sm.doTimeoutContext(timeoutSec, chromedp.InnerHTML(selector, html))
+	if err != nil {
+		panic(err)
+	}
+}
+
+func (sm *SiteManager) GetElementAttributeValue(selector string, attribute string, timeoutSec int64, options ...chromedp.QueryOption) (string, bool) {
+	var attributeValue string
+	var ok bool
+	err := sm.doTimeoutContext(timeoutSec, chromedp.AttributeValue(selector, attribute, &attributeValue, &ok, options...))
+	if err != nil {
+		panic(err)
+	}
+
+	return attributeValue, ok
+}
+
+func (sm *SiteManager) GetElementAttributes(selector string, timeoutSec int64, options ...chromedp.QueryOption) map[string]string {
+	var attributes map[string]string
+	err := sm.doTimeoutContext(timeoutSec, chromedp.Attributes(selector, &attributes, options...))
+	if err != nil {
+		panic(err)
+	}
+
+	return attributes
+}
+
+func (sm *SiteManager) GetElementsAttributes(selector string, timeoutSec int64, options ...chromedp.QueryOption) []map[string]string {
+	var attributes []map[string]string
+	err := sm.doTimeoutContext(timeoutSec, chromedp.AttributesAll(selector, &attributes, options...))
+	if err != nil {
+		panic(err)
+	}
+
+	return attributes
+}
+
 func (sm *SiteManager) KeyDown(key string, timeoutSec int64) {
 	err := sm.doTimeoutContext(timeoutSec, input.DispatchKeyEvent(input.KeyDown).WithKey(key))
 	if err != nil {

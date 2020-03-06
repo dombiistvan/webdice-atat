@@ -24,6 +24,13 @@ for example, you can:
   - wait for an element to be selected (WaitSelected)
   - wait for an element not to be presented (WaitNotPresent)
   - just wait (Wait)
+  - focus on an element (FocusElement)
+  - clear element's value (input and textarea) (ClearElement)
+  - double click on an element (DoubleClickElement)
+  - set inner html of an element (SetInnerHtml)
+  - get one attribute's value from an element (GetElementAttributeValue)
+  - get all attributes and values of the selector's first matching element (GetElementAttributes)
+  - get all attributes of all matching elements (GetElementsAttributes)
   
 and all of these actions with own timeout
 
@@ -70,6 +77,6 @@ You can start your own end-user test with this interface, by initializing ```Sit
     )
 ```
 
-..and you have to cast to string or call the .String() method on only the outest element, it will render the entire path until it has no more nested children.
+ ..and you have to cast to string or call the .String() method on only the outest element, it will render the entire path until it has no more nested children.
   
-  
+ also implemented several new HTML tag sub-function to make it easier to the xpath. Some of them has also an alias method...check it out  

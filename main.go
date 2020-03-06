@@ -1,6 +1,9 @@
 package main
 
 import (
+	b2 "./base"
+	"github.com/antchfx/htmlquery"
+	"github.com/chromedp/chromedp"
 	b "github.com/dombiistvan/webdice-atat/base"
 )
 
