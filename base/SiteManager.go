@@ -110,6 +110,17 @@ func (sm *SiteManager) FillFields(fields []map[string]interface{}, timeoutSec in
 	}
 }
 
+func (sm *SiteManager) FillField(identifier string, value string, timeoutSec int64, options ...chromedp.QueryOption) {
+	var actions []chromedp.Action
+
+	actions = append(actions, chromedp.SendKeys(identifier, value, options...))
+
+	err := sm.doTimeoutContext(timeoutSec, actions...)
+	if err != nil {
+		panic(err)
+	}
+}
+
 func (sm *SiteManager) WaitEnabled(selector string, timeoutSec int64) {
 	err := sm.doTimeoutContext(timeoutSec, chromedp.WaitEnabled(selector))
 	if err != nil {
