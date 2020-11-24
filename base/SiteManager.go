@@ -36,10 +36,11 @@ var (
 )
 
 type SiteManager struct {
-	ctx        context.Context
-	cancel     context.CancelFunc
-	info       chromedp.Device
-	timeoutSec int64
+	ctx          context.Context
+	cancel       context.CancelFunc
+	info         chromedp.Device
+	errorHandler func(err error)
+	timeoutSec   int64
 
 	fixActions []chromedp.Action
 }
@@ -275,8 +276,18 @@ func (sm *SiteManager) DoTimeoutContext(timeoutSec int64, action ...chromedp.Act
 	return err
 }
 
+func (sm *SiteManager) AddErrorHandler(eh func(err error)) {
+	sm.errorHandler = eh
+}
+
 func (sm SiteManager) Error(err error) {
-	if err != nil {
-		panic(err)
+	if err == nil {
+		return
 	}
+	if sm.errorHandler != nil {
+		sm.errorHandler(err)
+		return
+	}
+
+	panic(err)
 }
