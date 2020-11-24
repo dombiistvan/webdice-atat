@@ -8,7 +8,6 @@ import (
 	"github.com/chromedp/chromedp"
 	"github.com/chromedp/chromedp/device"
 	"io/ioutil"
-	"log"
 	"reflect"
 	"time"
 )
@@ -277,5 +276,5 @@ func (sm *SiteManager) doTimeoutContext(timeoutSec int64, action ...chromedp.Act
 }
 
 func (sm SiteManager) Error(err error) {
-	log.Fatal(err)
+	panic(err)
 }
