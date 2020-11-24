@@ -276,5 +276,7 @@ func (sm *SiteManager) doTimeoutContext(timeoutSec int64, action ...chromedp.Act
 }
 
 func (sm SiteManager) Error(err error) {
-	panic(err)
+	if err != nil {
+		panic(err)
+	}
 }
