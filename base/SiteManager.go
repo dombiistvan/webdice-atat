@@ -185,12 +185,12 @@ func (sm *SiteManager) DoubleClickElement(selector string, timeoutSec int64, opt
 	sm.Error(err)
 }
 
-func (sm *SiteManager) GetInnerHtml(selector string, timeoutSec int64, html *string) {
+func (sm *SiteManager) InnerHtmlInto(selector string, timeoutSec int64, html *string) {
 	err := sm.doTimeoutContext(timeoutSec, chromedp.InnerHTML(selector, html))
 	sm.Error(err)
 }
 
-func (sm *SiteManager) GetText(selector string, timeoutSec int64, text *string) {
+func (sm *SiteManager) TextInto(selector string, timeoutSec int64, text *string) {
 	err := sm.doTimeoutContext(timeoutSec, chromedp.Text(selector, text))
 	sm.Error(err)
 }
