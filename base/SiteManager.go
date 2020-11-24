@@ -55,9 +55,7 @@ func (sm *SiteManager) Init(d chromedp.Device, defTimeoutSec int64) {
 func (sm *SiteManager) GoToPath(url string, timoutSec int64) {
 	err := sm.DoTimeoutContext(timoutSec, chromedp.Navigate(url))
 
-	if err != nil {
-		panic(err)
-	}
+	sm.Error(err)
 }
 
 func (sm *SiteManager) CreateScreenShot(filename string, timeoutSec int64) {
@@ -65,15 +63,11 @@ func (sm *SiteManager) CreateScreenShot(filename string, timeoutSec int64) {
 
 	err := sm.DoTimeoutContext(timeoutSec, chromedp.CaptureScreenshot(&p))
 
-	if err != nil {
-		panic(err)
-	}
+	sm.Error(err)
 
 	err = ioutil.WriteFile(filename, p, 0755)
 
-	if err != nil {
-		panic(err)
-	}
+	sm.Error(err)
 }
 
 func (sm *SiteManager) Cancel() {
@@ -99,7 +93,7 @@ func (sm *SiteManager) FillFields(fields []map[string]interface{}, timeoutSec in
 			actions = append(actions, chromedp.SendKeys(identifier, value.(string)))
 		} else if kok && vok {
 			if reflect.TypeOf(options) != reflect.TypeOf([]chromedp.QueryOption{}) {
-				panic(errors.New("options must be instance of []chromedp.QueryOption"))
+				sm.Error(errors.New("options must be instance of []chromedp.QueryOption"))
 			}
 			actions = append(actions, chromedp.SendKeys(identifier, value.(string), options.([]chromedp.QueryOption)...))
 		}
