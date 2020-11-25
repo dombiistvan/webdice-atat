@@ -207,8 +207,15 @@ func (sm *SiteManager) DoubleClickElement(selector string, timeoutSec int64, opt
 	return err
 }
 
-func (sm *SiteManager) InnerHtmlInto(selector string, timeoutSec int64, html *string) error {
+func (sm *SiteManager) InnerHTMLInto(selector string, timeoutSec int64, html *string) error {
 	err := sm.DoTimeoutContext(timeoutSec, chromedp.InnerHTML(selector, html))
+	sm.Error(err)
+
+	return err
+}
+
+func (sm *SiteManager) OuterHTMLInto(selector string, timeoutSec int64, html *string) error {
+	err := sm.DoTimeoutContext(timeoutSec, chromedp.OuterHTML(selector, html))
 	sm.Error(err)
 
 	return err
