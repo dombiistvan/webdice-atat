@@ -74,7 +74,7 @@ func (sm *SiteManager) Cancel() {
 	sm.cancel()
 }
 
-func (sm SiteManager) ById(path, tag, id string) string {
+func (sm SiteManager) ByID(path, tag, id string) string {
 	return sm.ByAttribute(path, tag, "id", id)
 }
 
@@ -82,7 +82,7 @@ func (sm SiteManager) ByAttribute(path, tag, attributeKey, attributeValue string
 	return fmt.Sprintf(`%s%s[%s="%s"]`, path, tag, attributeKey, attributeValue)
 }
 
-func (sm *SiteManager) FillFields(fields []map[string]interface{}, timeoutSec int64) {
+func (sm *SiteManager) FillFields(fields []map[string]interface{}, timeoutSec int64) error {
 	var actions []chromedp.Action
 
 	for _, fd := range fields {
@@ -101,45 +101,61 @@ func (sm *SiteManager) FillFields(fields []map[string]interface{}, timeoutSec in
 
 	err := sm.DoTimeoutContext(timeoutSec, actions...)
 	sm.Error(err)
+
+	return err
 }
 
-func (sm *SiteManager) FillField(identifier string, value string, timeoutSec int64, options ...chromedp.QueryOption) {
+func (sm *SiteManager) FillField(identifier string, value string, timeoutSec int64, options ...chromedp.QueryOption) error {
 	var actions []chromedp.Action
 
 	actions = append(actions, chromedp.SendKeys(identifier, value, options...))
 
 	err := sm.DoTimeoutContext(timeoutSec, actions...)
 	sm.Error(err)
+
+	return err
 }
 
-func (sm *SiteManager) WaitEnabled(selector string, timeoutSec int64) {
+func (sm *SiteManager) WaitEnabled(selector string, timeoutSec int64) error {
 	err := sm.DoTimeoutContext(timeoutSec, chromedp.WaitEnabled(selector))
 	sm.Error(err)
+
+	return err
 }
 
-func (sm *SiteManager) WaitNotPresent(selector string, timeoutSec int64) {
+func (sm *SiteManager) WaitNotPresent(selector string, timeoutSec int64) error {
 	err := sm.DoTimeoutContext(timeoutSec, chromedp.WaitNotPresent(selector))
 	sm.Error(err)
+
+	return err
 }
 
-func (sm *SiteManager) WaitNotVisible(selector string, timeoutSec int64) {
+func (sm *SiteManager) WaitNotVisible(selector string, timeoutSec int64) error {
 	err := sm.DoTimeoutContext(timeoutSec, chromedp.WaitNotVisible(selector))
 	sm.Error(err)
+
+	return err
 }
 
-func (sm *SiteManager) WaitVisible(selector string, timeoutSec int64) {
+func (sm *SiteManager) WaitVisible(selector string, timeoutSec int64) error {
 	err := sm.DoTimeoutContext(timeoutSec, chromedp.WaitVisible(selector))
 	sm.Error(err)
+
+	return err
 }
 
-func (sm *SiteManager) WaitSelected(selector string, timeoutSec int64) {
+func (sm *SiteManager) WaitSelected(selector string, timeoutSec int64) error {
 	err := sm.DoTimeoutContext(timeoutSec, chromedp.WaitSelected(selector))
 	sm.Error(err)
+
+	return err
 }
 
-func (sm *SiteManager) WaitReady(selector string, timeoutSec int64) {
+func (sm *SiteManager) WaitReady(selector string, timeoutSec int64) error {
 	err := sm.DoTimeoutContext(timeoutSec, chromedp.WaitReady(selector))
 	sm.Error(err)
+
+	return err
 }
 
 /*func (sm *SiteManager) PressButton(selector string, timeoutSec int64 ,options... chromedp.QueryOption){
@@ -149,89 +165,113 @@ func (sm *SiteManager) WaitReady(selector string, timeoutSec int64) {
 	}
 }*/
 
-func (sm *SiteManager) ClickElement(selector string, timeoutSec int64, options ...chromedp.QueryOption) {
+func (sm *SiteManager) ClickElement(selector string, timeoutSec int64, options ...chromedp.QueryOption) error {
 	err := sm.DoTimeoutContext(timeoutSec, chromedp.Click(selector, options...))
 	sm.Error(err)
+
+	return err
 }
 
-func (sm *SiteManager) Wait(secs int64) {
+func (sm *SiteManager) Wait(secs int64) error {
 	err := sm.DoTimeoutContext(0, chromedp.Sleep(time.Second*time.Duration(secs)))
 	sm.Error(err)
+
+	return err
 }
 
-func (sm *SiteManager) CustomAction(action chromedp.ActionFunc, timeoutSec int64) {
+func (sm *SiteManager) CustomAction(action chromedp.ActionFunc, timeoutSec int64) error {
 	err := sm.DoTimeoutContext(timeoutSec, action)
 	sm.Error(err)
+
+	return err
 }
 
-func (sm *SiteManager) FocusElement(selector string, timeoutSec int64, options ...chromedp.QueryOption) {
+func (sm *SiteManager) FocusElement(selector string, timeoutSec int64, options ...chromedp.QueryOption) error {
 	err := sm.DoTimeoutContext(timeoutSec, chromedp.Focus(selector, options...))
 	sm.Error(err)
+
+	return err
 }
 
-func (sm *SiteManager) ClearElement(selector string, timeoutSec int64, options ...chromedp.QueryOption) {
+func (sm *SiteManager) ClearElement(selector string, timeoutSec int64, options ...chromedp.QueryOption) error {
 	err := sm.DoTimeoutContext(timeoutSec, chromedp.Clear(selector, options...))
 	sm.Error(err)
+
+	return err
 }
 
-func (sm *SiteManager) DoubleClickElement(selector string, timeoutSec int64, options ...chromedp.QueryOption) {
+func (sm *SiteManager) DoubleClickElement(selector string, timeoutSec int64, options ...chromedp.QueryOption) error {
 	err := sm.DoTimeoutContext(timeoutSec, chromedp.DoubleClick(selector, options...))
 	sm.Error(err)
+
+	return err
 }
 
-func (sm *SiteManager) InnerHtmlInto(selector string, timeoutSec int64, html *string) {
+func (sm *SiteManager) InnerHtmlInto(selector string, timeoutSec int64, html *string) error {
 	err := sm.DoTimeoutContext(timeoutSec, chromedp.InnerHTML(selector, html))
 	sm.Error(err)
+
+	return err
 }
 
-func (sm *SiteManager) TextInto(selector string, timeoutSec int64, text *string) {
+func (sm *SiteManager) TextInto(selector string, timeoutSec int64, text *string) error {
 	err := sm.DoTimeoutContext(timeoutSec, chromedp.Text(selector, text))
 	sm.Error(err)
+
+	return err
 }
 
-func (sm *SiteManager) GetElementAttributeValue(selector string, attribute string, timeoutSec int64, options ...chromedp.QueryOption) (string, bool) {
+func (sm *SiteManager) GetElementAttributeValue(selector string, attribute string, timeoutSec int64, options ...chromedp.QueryOption) (string, bool, error) {
 	var attributeValue string
 	var ok bool
 	err := sm.DoTimeoutContext(timeoutSec, chromedp.AttributeValue(selector, attribute, &attributeValue, &ok, options...))
 	sm.Error(err)
 
-	return attributeValue, ok
+	return attributeValue, ok, err
 }
 
-func (sm *SiteManager) GetElementAttributes(selector string, timeoutSec int64, options ...chromedp.QueryOption) map[string]string {
+func (sm *SiteManager) GetElementAttributes(selector string, timeoutSec int64, options ...chromedp.QueryOption) (map[string]string, error) {
 	var attributes map[string]string
 	err := sm.DoTimeoutContext(timeoutSec, chromedp.Attributes(selector, &attributes, options...))
 	sm.Error(err)
 
-	return attributes
+	return attributes, err
 }
 
-func (sm *SiteManager) GetElementsAttributes(selector string, timeoutSec int64, options ...chromedp.QueryOption) []map[string]string {
+func (sm *SiteManager) GetElementsAttributes(selector string, timeoutSec int64, options ...chromedp.QueryOption) ([]map[string]string, error) {
 	var attributes []map[string]string
 	err := sm.DoTimeoutContext(timeoutSec, chromedp.AttributesAll(selector, &attributes, options...))
 	sm.Error(err)
 
-	return attributes
+	return attributes, err
 }
 
-func (sm *SiteManager) KeyDown(key string, timeoutSec int64) {
+func (sm *SiteManager) KeyDown(key string, timeoutSec int64) error {
 	err := sm.DoTimeoutContext(timeoutSec, input.DispatchKeyEvent(input.KeyDown).WithKey(key))
 	sm.Error(err)
+
+	return err
 }
 
-func (sm *SiteManager) KeyRawDown(key string, timeoutSec int64) {
+func (sm *SiteManager) KeyRawDown(key string, timeoutSec int64) error {
 	err := sm.DoTimeoutContext(timeoutSec, input.DispatchKeyEvent(input.KeyRawDown).WithKey(key))
 	sm.Error(err)
+
+	return err
 }
 
-func (sm *SiteManager) KeyUp(key string, timeoutSec int64) {
+func (sm *SiteManager) KeyUp(key string, timeoutSec int64) error {
 	err := sm.DoTimeoutContext(timeoutSec, input.DispatchKeyEvent(input.KeyUp).WithKey(key))
 	sm.Error(err)
+
+	return err
 }
 
-func (sm *SiteManager) KeyChar(key string, timeoutSec int64) {
+func (sm *SiteManager) KeyChar(key string, timeoutSec int64) error {
 	err := sm.DoTimeoutContext(timeoutSec, input.DispatchKeyEvent(input.KeyChar).WithKey(key))
 	sm.Error(err)
+
+	return err
 }
 
 func (sm SiteManager) getActions(actions ...chromedp.Action) []chromedp.Action {
