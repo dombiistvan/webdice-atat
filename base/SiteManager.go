@@ -53,7 +53,7 @@ func (sm *SiteManager) Init(d chromedp.Device, defTimeoutSec int64) {
 }
 
 func (sm *SiteManager) GoToPath(url string, timoutSec int64, handleError bool) error {
-	err := sm.DoTimeoutContext(timoutSec, chromedp.Navigate(url))
+	err := sm.DoTimeoutContext(timoutSec, false, chromedp.Navigate(url))
 
 	sm.Error(err, handleError)
 
@@ -63,7 +63,7 @@ func (sm *SiteManager) GoToPath(url string, timoutSec int64, handleError bool) e
 func (sm *SiteManager) CreateScreenShot(filename string, timeoutSec int64, handleError bool) error {
 	var p []byte
 
-	err := sm.DoTimeoutContext(timeoutSec, chromedp.CaptureScreenshot(&p))
+	err := sm.DoTimeoutContext(timeoutSec, false, chromedp.CaptureScreenshot(&p))
 
 	sm.Error(err, handleError)
 	if err != nil {
