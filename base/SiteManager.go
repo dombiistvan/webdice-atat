@@ -123,6 +123,17 @@ func (sm *SiteManager) FillField(identifier string, value string, timeoutSec int
 	return err
 }
 
+func (sm *SiteManager) ScrollTo(identifier string, timeoutSec int64, handleError bool) error {
+	var actions []chromedp.Action
+
+	actions = append(actions, chromedp.ScrollIntoView(identifier))
+
+	err := sm.DoTimeoutContext(timeoutSec, false, actions...)
+	sm.Error(err, handleError)
+
+	return err
+}
+
 func (sm *SiteManager) WaitEnabled(selector string, timeoutSec int64, handleError bool) error {
 	err := sm.DoTimeoutContext(timeoutSec, false, chromedp.WaitEnabled(selector))
 	sm.Error(err, handleError)
