@@ -37,7 +37,7 @@ var (
 
 type SiteManager struct {
 	ctx          context.Context
-	cancel       context.CancelFunc
+	cancel       []context.CancelFunc
 	info         chromedp.Device
 	errorHandler func(err error)
 	timeoutSec   int64
@@ -45,9 +45,24 @@ type SiteManager struct {
 	fixActions []chromedp.Action
 }
 
-func (sm *SiteManager) Init(d chromedp.Device, defTimeoutSec int64) {
+func (sm *SiteManager) Init(d chromedp.Device, defTimeoutSec int64, headless bool, ignoreCertErrors bool) {
 	sm.info = d
-	sm.ctx, sm.cancel = chromedp.NewContext(context.Background())
+
+	opts := append(chromedp.DefaultExecAllocatorOptions[:],
+		chromedp.NoDefaultBrowserCheck,
+		chromedp.Flag("headless", headless),
+		chromedp.Flag("ignore-certificate-errors", ignoreCertErrors),
+	)
+
+	neaCtx, cancel := chromedp.NewExecAllocator(context.Background(), opts...)
+	sm.cancel = append(sm.cancel, cancel)
+
+	// create a timeout
+	taskCtx, ttCancel := context.WithTimeout(neaCtx, time.Duration(defTimeoutSec)*time.Second)
+	sm.cancel = append(sm.cancel, ttCancel)
+
+	sm.ctx = taskCtx
+
 	sm.fixActions = append(sm.fixActions, chromedp.EmulateViewport(sm.info.Device().Width, sm.info.Device().Height))
 	sm.timeoutSec = defTimeoutSec
 }
@@ -77,7 +92,9 @@ func (sm *SiteManager) CreateScreenShot(filename string, timeoutSec int64, handl
 }
 
 func (sm *SiteManager) Cancel() {
-	sm.cancel()
+	for i := len(sm.cancel) - 1; i >= 0; i++ {
+		sm.cancel[i]()
+	}
 }
 
 func (sm SiteManager) ByID(path, tag, id string) string {
