@@ -8,6 +8,7 @@ import (
 	"github.com/chromedp/chromedp"
 	"github.com/chromedp/chromedp/device"
 	"io/ioutil"
+	"log"
 	"reflect"
 	"time"
 )
@@ -57,8 +58,12 @@ func (sm *SiteManager) Init(d chromedp.Device, defTimeoutSec int64, headless boo
 	neaCtx, cancel := chromedp.NewExecAllocator(context.Background(), opts...)
 	sm.cancel = append(sm.cancel, cancel)
 
+	// also set up a custom logger
+	ncCtx, tCancel := chromedp.NewContext(neaCtx, chromedp.WithLogf(log.Printf))
+	sm.cancel = append(sm.cancel, tCancel)
+
 	// create a timeout
-	taskCtx, ttCancel := context.WithTimeout(neaCtx, time.Duration(defTimeoutSec)*time.Second)
+	taskCtx, ttCancel := context.WithTimeout(ncCtx, time.Duration(defTimeoutSec)*time.Second)
 	sm.cancel = append(sm.cancel, ttCancel)
 
 	sm.ctx = taskCtx
