@@ -43,11 +43,15 @@ type SiteManager struct {
 	errorHandler func(err error)
 	timeoutSec   int64
 
+	activeGroup  string
+	groupActions map[string][]chromedp.Action
+
 	fixActions []chromedp.Action
 }
 
 func (sm *SiteManager) Init(d chromedp.Device, defTimeoutSec int64, headless bool, ignoreCertErrors bool) {
 	sm.info = d
+	sm.groupActions = make(map[string][]chromedp.Action)
 
 	opts := append(chromedp.DefaultExecAllocatorOptions[:],
 		chromedp.NoDefaultBrowserCheck,
@@ -75,8 +79,40 @@ func (sm *SiteManager) Init(d chromedp.Device, defTimeoutSec int64, headless boo
 	sm.timeoutSec = defTimeoutSec
 }
 
+func (sm *SiteManager) Group(group string) {
+	sm.activeGroup = group
+}
+
+// if group is empty, it will check for the actual group and run actions from it
+func (sm *SiteManager) GroupProcess(group string, timeoutSecs int64, handleError bool) error {
+	if group == "" && sm.activeGroup == "" {
+		return errors.New("could not run actions connected to empty group")
+	}
+
+	if group == "" {
+		group = sm.activeGroup
+	}
+
+	actions, gok := sm.groupActions[group]
+
+	if !gok || len(actions) == 0 {
+		return errors.New(`your group does not exists, or there is no related action`)
+	}
+
+	err := sm.DoTimeoutContext(timeoutSecs, false, sm.groupActions[group]...)
+
+	sm.Error(err, handleError)
+
+	return err
+}
+
 func (sm *SiteManager) GoToPath(url string, timoutSec int64, handleError bool) error {
-	err := sm.DoTimeoutContext(timoutSec, false, chromedp.Navigate(url))
+	action := chromedp.Navigate(url)
+	if sm.activeGroup != "" {
+		sm.groupActions[sm.activeGroup] = append(sm.groupActions[sm.activeGroup], action)
+		return nil
+	}
+	err := sm.DoTimeoutContext(timoutSec, false, action)
 
 	sm.Error(err, handleError)
 
@@ -85,8 +121,12 @@ func (sm *SiteManager) GoToPath(url string, timoutSec int64, handleError bool) e
 
 func (sm *SiteManager) CreateScreenShot(filename string, timeoutSec int64, handleError bool) error {
 	var p []byte
-
-	err := sm.DoTimeoutContext(timeoutSec, false, chromedp.CaptureScreenshot(&p))
+	action := chromedp.CaptureScreenshot(&p)
+	if sm.activeGroup != "" {
+		sm.groupActions[sm.activeGroup] = append(sm.groupActions[sm.activeGroup], action)
+		return nil
+	}
+	err := sm.DoTimeoutContext(timeoutSec, false, action)
 
 	sm.Error(err, handleError)
 	if err != nil {
@@ -130,6 +170,11 @@ func (sm *SiteManager) FillFields(fields []map[string]interface{}, timeoutSec in
 		}
 	}
 
+	if sm.activeGroup != "" {
+		sm.groupActions[sm.activeGroup] = append(sm.groupActions[sm.activeGroup], actions...)
+		return nil
+	}
+
 	err := sm.DoTimeoutContext(timeoutSec, false, actions...)
 
 	sm.Error(err, handleError)
@@ -142,6 +187,11 @@ func (sm *SiteManager) FillField(identifier string, value string, timeoutSec int
 
 	actions = append(actions, chromedp.SendKeys(identifier, value, options...))
 
+	if sm.activeGroup != "" {
+		sm.groupActions[sm.activeGroup] = append(sm.groupActions[sm.activeGroup], actions...)
+		return nil
+	}
+
 	err := sm.DoTimeoutContext(timeoutSec, false, actions...)
 	sm.Error(err, handleError)
 
@@ -149,49 +199,91 @@ func (sm *SiteManager) FillField(identifier string, value string, timeoutSec int
 }
 
 func (sm *SiteManager) ScrollTo(identifier string, timeoutSec int64, handleError bool) error {
-	err := sm.DoTimeoutContext(timeoutSec, false, chromedp.ScrollIntoView(identifier))
+	action := chromedp.ScrollIntoView(identifier)
+	if sm.activeGroup != "" {
+		sm.groupActions[sm.activeGroup] = append(sm.groupActions[sm.activeGroup], action)
+		return nil
+	}
+
+	err := sm.DoTimeoutContext(timeoutSec, false, action)
 	sm.Error(err, handleError)
 
 	return err
 }
 
 func (sm *SiteManager) WaitEnabled(selector string, timeoutSec int64, handleError bool) error {
-	err := sm.DoTimeoutContext(timeoutSec, false, chromedp.WaitEnabled(selector))
+	action := chromedp.WaitEnabled(selector)
+	if sm.activeGroup != "" {
+		sm.groupActions[sm.activeGroup] = append(sm.groupActions[sm.activeGroup], action)
+		return nil
+	}
+
+	err := sm.DoTimeoutContext(timeoutSec, false, action)
 	sm.Error(err, handleError)
 
 	return err
 }
 
 func (sm *SiteManager) WaitNotPresent(selector string, timeoutSec int64, handleError bool) error {
-	err := sm.DoTimeoutContext(timeoutSec, false, chromedp.WaitNotPresent(selector))
+	action := chromedp.WaitNotPresent(selector)
+	if sm.activeGroup != "" {
+		sm.groupActions[sm.activeGroup] = append(sm.groupActions[sm.activeGroup], action)
+		return nil
+	}
+
+	err := sm.DoTimeoutContext(timeoutSec, false, action)
 	sm.Error(err, handleError)
 
 	return err
 }
 
 func (sm *SiteManager) WaitNotVisible(selector string, timeoutSec int64, handleError bool) error {
-	err := sm.DoTimeoutContext(timeoutSec, false, chromedp.WaitNotVisible(selector))
+	action := chromedp.WaitNotVisible(selector)
+	if sm.activeGroup != "" {
+		sm.groupActions[sm.activeGroup] = append(sm.groupActions[sm.activeGroup], action)
+		return nil
+	}
+
+	err := sm.DoTimeoutContext(timeoutSec, false, action)
 	sm.Error(err, handleError)
 
 	return err
 }
 
 func (sm *SiteManager) WaitVisible(selector string, timeoutSec int64, handleError bool) error {
-	err := sm.DoTimeoutContext(timeoutSec, false, chromedp.WaitVisible(selector))
+	action := chromedp.WaitVisible(selector)
+	if sm.activeGroup != "" {
+		sm.groupActions[sm.activeGroup] = append(sm.groupActions[sm.activeGroup], action)
+		return nil
+	}
+
+	err := sm.DoTimeoutContext(timeoutSec, false, action)
 	sm.Error(err, handleError)
 
 	return err
 }
 
 func (sm *SiteManager) WaitSelected(selector string, timeoutSec int64, handleError bool) error {
-	err := sm.DoTimeoutContext(timeoutSec, false, chromedp.WaitSelected(selector))
+	action := chromedp.WaitSelected(selector)
+	if sm.activeGroup != "" {
+		sm.groupActions[sm.activeGroup] = append(sm.groupActions[sm.activeGroup], action)
+		return nil
+	}
+
+	err := sm.DoTimeoutContext(timeoutSec, false, action)
 	sm.Error(err, handleError)
 
 	return err
 }
 
 func (sm *SiteManager) WaitReady(selector string, timeoutSec int64, handleError bool) error {
-	err := sm.DoTimeoutContext(timeoutSec, false, chromedp.WaitReady(selector))
+	action := chromedp.WaitReady(selector)
+	if sm.activeGroup != "" {
+		sm.groupActions[sm.activeGroup] = append(sm.groupActions[sm.activeGroup], action)
+		return nil
+	}
+
+	err := sm.DoTimeoutContext(timeoutSec, false, action)
 	sm.Error(err, handleError)
 
 	return err
@@ -205,20 +297,37 @@ func (sm *SiteManager) WaitReady(selector string, timeoutSec int64, handleError 
 }*/
 
 func (sm *SiteManager) ClickElement(selector string, timeoutSec int64, handleError bool, options ...chromedp.QueryOption) error {
-	err := sm.DoTimeoutContext(timeoutSec, false, chromedp.Click(selector, options...))
+	action := chromedp.Click(selector, options...)
+	if sm.activeGroup != "" {
+		sm.groupActions[sm.activeGroup] = append(sm.groupActions[sm.activeGroup], action)
+		return nil
+	}
+
+	err := sm.DoTimeoutContext(timeoutSec, false, action)
 	sm.Error(err, handleError)
 
 	return err
 }
 
 func (sm *SiteManager) Wait(secs int64, handleError bool) error {
-	err := sm.DoTimeoutContext(0, false, chromedp.Sleep(time.Second*time.Duration(secs)))
+	action := chromedp.Sleep(time.Second * time.Duration(secs))
+	if sm.activeGroup != "" {
+		sm.groupActions[sm.activeGroup] = append(sm.groupActions[sm.activeGroup], action)
+		return nil
+	}
+
+	err := sm.DoTimeoutContext(0, false, action)
 	sm.Error(err, handleError)
 
 	return err
 }
 
 func (sm *SiteManager) CustomAction(action chromedp.ActionFunc, timeoutSec int64, handleError bool) error {
+	if sm.activeGroup != "" {
+		sm.groupActions[sm.activeGroup] = append(sm.groupActions[sm.activeGroup], action)
+		return nil
+	}
+
 	err := sm.DoTimeoutContext(timeoutSec, false, action)
 	sm.Error(err, handleError)
 
@@ -226,95 +335,169 @@ func (sm *SiteManager) CustomAction(action chromedp.ActionFunc, timeoutSec int64
 }
 
 func (sm *SiteManager) FocusElement(selector string, timeoutSec int64, handleError bool, options ...chromedp.QueryOption) error {
-	err := sm.DoTimeoutContext(timeoutSec, false, chromedp.Focus(selector, options...))
+	action := chromedp.Focus(selector, options...)
+	if sm.activeGroup != "" {
+		sm.groupActions[sm.activeGroup] = append(sm.groupActions[sm.activeGroup], action)
+		return nil
+	}
+
+	err := sm.DoTimeoutContext(timeoutSec, false, action)
 	sm.Error(err, handleError)
 
 	return err
 }
 
 func (sm *SiteManager) ClearElement(selector string, timeoutSec int64, handleError bool, options ...chromedp.QueryOption) error {
-	err := sm.DoTimeoutContext(timeoutSec, false, chromedp.Clear(selector, options...))
+	action := chromedp.Clear(selector, options...)
+	if sm.activeGroup != "" {
+		sm.groupActions[sm.activeGroup] = append(sm.groupActions[sm.activeGroup], action)
+		return nil
+	}
+
+	err := sm.DoTimeoutContext(timeoutSec, false, action)
 	sm.Error(err, handleError)
 
 	return err
 }
 
 func (sm *SiteManager) DoubleClickElement(selector string, timeoutSec int64, handleError bool, options ...chromedp.QueryOption) error {
-	err := sm.DoTimeoutContext(timeoutSec, false, chromedp.DoubleClick(selector, options...))
+	action := chromedp.DoubleClick(selector, options...)
+	if sm.activeGroup != "" {
+		sm.groupActions[sm.activeGroup] = append(sm.groupActions[sm.activeGroup], action)
+		return nil
+	}
+
+	err := sm.DoTimeoutContext(timeoutSec, false, action)
 	sm.Error(err, handleError)
 
 	return err
 }
 
 func (sm *SiteManager) InnerHTMLInto(selector string, timeoutSec int64, html *string, handleError bool) error {
-	err := sm.DoTimeoutContext(timeoutSec, false, chromedp.InnerHTML(selector, html))
+	action := chromedp.InnerHTML(selector, html)
+	if sm.activeGroup != "" {
+		sm.groupActions[sm.activeGroup] = append(sm.groupActions[sm.activeGroup], action)
+		return nil
+	}
+
+	err := sm.DoTimeoutContext(timeoutSec, false, action)
 	sm.Error(err, handleError)
 
 	return err
 }
 
 func (sm *SiteManager) OuterHTMLInto(selector string, timeoutSec int64, html *string, handleError bool) error {
-	err := sm.DoTimeoutContext(timeoutSec, false, chromedp.OuterHTML(selector, html))
+	action := chromedp.OuterHTML(selector, html)
+	if sm.activeGroup != "" {
+		sm.groupActions[sm.activeGroup] = append(sm.groupActions[sm.activeGroup], action)
+		return nil
+	}
+
+	err := sm.DoTimeoutContext(timeoutSec, false, action)
 	sm.Error(err, handleError)
 
 	return err
 }
 
 func (sm *SiteManager) TextInto(selector string, timeoutSec int64, text *string, handleError bool) error {
-	err := sm.DoTimeoutContext(timeoutSec, false, chromedp.Text(selector, text))
+	action := chromedp.Text(selector, text)
+	if sm.activeGroup != "" {
+		sm.groupActions[sm.activeGroup] = append(sm.groupActions[sm.activeGroup], action)
+		return nil
+	}
+
+	err := sm.DoTimeoutContext(timeoutSec, false, action)
 	sm.Error(err, handleError)
 
 	return err
 }
 
-func (sm *SiteManager) GetElementAttributeValue(selector string, attribute string, timeoutSec int64, handleError bool, options ...chromedp.QueryOption) (string, bool, error) {
-	var attributeValue string
-	var ok bool
-	err := sm.DoTimeoutContext(timeoutSec, false, chromedp.AttributeValue(selector, attribute, &attributeValue, &ok, options...))
+func (sm *SiteManager) GetElementAttributeValue(selector string, attribute string, into *string, ok *bool, timeoutSec int64, handleError bool, options ...chromedp.QueryOption) error {
+	action := chromedp.AttributeValue(selector, attribute, into, ok, options...)
+	if sm.activeGroup != "" {
+		sm.groupActions[sm.activeGroup] = append(sm.groupActions[sm.activeGroup], action)
+		return nil
+	}
+
+	err := sm.DoTimeoutContext(timeoutSec, false, action)
 	sm.Error(err, handleError)
 
-	return attributeValue, ok, err
+	return err
 }
 
-func (sm *SiteManager) GetElementAttributes(selector string, timeoutSec int64, handleError bool, options ...chromedp.QueryOption) (map[string]string, error) {
-	var attributes map[string]string
-	err := sm.DoTimeoutContext(timeoutSec, false, chromedp.Attributes(selector, &attributes, options...))
+func (sm *SiteManager) GetElementAttributes(selector string, into *map[string]string, timeoutSec int64, handleError bool, options ...chromedp.QueryOption) error {
+	action := chromedp.Attributes(selector, into, options...)
+	if sm.activeGroup != "" {
+		sm.groupActions[sm.activeGroup] = append(sm.groupActions[sm.activeGroup], action)
+		return nil
+	}
+
+	err := sm.DoTimeoutContext(timeoutSec, false, action)
 	sm.Error(err, handleError)
 
-	return attributes, err
+	return err
 }
 
-func (sm *SiteManager) GetElementsAttributes(selector string, timeoutSec int64, handleError bool, options ...chromedp.QueryOption) ([]map[string]string, error) {
-	var attributes []map[string]string
-	err := sm.DoTimeoutContext(timeoutSec, false, chromedp.AttributesAll(selector, &attributes, options...))
+func (sm *SiteManager) GetElementsAttributes(selector string, into *[]map[string]string, timeoutSec int64, handleError bool, options ...chromedp.QueryOption) error {
+	action := chromedp.AttributesAll(selector, into, options...)
+	if sm.activeGroup != "" {
+		sm.groupActions[sm.activeGroup] = append(sm.groupActions[sm.activeGroup], action)
+		return nil
+	}
+
+	err := sm.DoTimeoutContext(timeoutSec, false, action)
 	sm.Error(err, handleError)
 
-	return attributes, err
+	return err
 }
 
 func (sm *SiteManager) KeyDown(key string, timeoutSec int64, handleError bool) error {
-	err := sm.DoTimeoutContext(timeoutSec, false, input.DispatchKeyEvent(input.KeyDown).WithKey(key))
+	action := input.DispatchKeyEvent(input.KeyDown).WithKey(key)
+	if sm.activeGroup != "" {
+		sm.groupActions[sm.activeGroup] = append(sm.groupActions[sm.activeGroup], action)
+		return nil
+	}
+
+	err := sm.DoTimeoutContext(timeoutSec, false, action)
 	sm.Error(err, handleError)
 
 	return err
 }
 
 func (sm *SiteManager) KeyRawDown(key string, timeoutSec int64, handleError bool) error {
-	err := sm.DoTimeoutContext(timeoutSec, false, input.DispatchKeyEvent(input.KeyRawDown).WithKey(key))
+	action := input.DispatchKeyEvent(input.KeyRawDown).WithKey(key)
+	if sm.activeGroup != "" {
+		sm.groupActions[sm.activeGroup] = append(sm.groupActions[sm.activeGroup], action)
+		return nil
+	}
+
+	err := sm.DoTimeoutContext(timeoutSec, false, action)
 	sm.Error(err, handleError)
 
 	return err
 }
 
 func (sm *SiteManager) KeyUp(key string, timeoutSec int64, handleError bool) error {
-	err := sm.DoTimeoutContext(timeoutSec, false, input.DispatchKeyEvent(input.KeyUp).WithKey(key))
+	action := input.DispatchKeyEvent(input.KeyUp).WithKey(key)
+	if sm.activeGroup != "" {
+		sm.groupActions[sm.activeGroup] = append(sm.groupActions[sm.activeGroup], action)
+		return nil
+	}
+
+	err := sm.DoTimeoutContext(timeoutSec, false, action)
 	sm.Error(err, handleError)
 
 	return err
 }
 
 func (sm *SiteManager) KeyChar(key string, timeoutSec int64, handleError bool) error {
-	err := sm.DoTimeoutContext(timeoutSec, false, input.DispatchKeyEvent(input.KeyChar).WithKey(key))
+	action := input.DispatchKeyEvent(input.KeyChar).WithKey(key)
+	if sm.activeGroup != "" {
+		sm.groupActions[sm.activeGroup] = append(sm.groupActions[sm.activeGroup], action)
+		return nil
+	}
+
+	err := sm.DoTimeoutContext(timeoutSec, false, action)
 	sm.Error(err, handleError)
 
 	return err
