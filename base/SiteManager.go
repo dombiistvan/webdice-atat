@@ -120,20 +120,19 @@ func (sm *SiteManager) GoToPath(url string, timoutSec int64, handleError bool) e
 }
 
 func (sm *SiteManager) CreateScreenShot(filename string, timeoutSec int64, handleError bool) error {
-	var p []byte
-	action := chromedp.CaptureScreenshot(&p)
+	action := chromedp.ActionFunc(func(ctx context.Context) error {
+		var p []byte
+		chromedp.CaptureScreenshot(&p)
+		err := ioutil.WriteFile(filename, p, 0755)
+		return err
+	})
+
 	if sm.activeGroup != "" {
 		sm.groupActions[sm.activeGroup] = append(sm.groupActions[sm.activeGroup], action)
 		return nil
 	}
 	err := sm.DoTimeoutContext(timeoutSec, false, action)
 
-	sm.Error(err, handleError)
-	if err != nil {
-		return err
-	}
-
-	err = ioutil.WriteFile(filename, p, 0755)
 	sm.Error(err, handleError)
 
 	return err
