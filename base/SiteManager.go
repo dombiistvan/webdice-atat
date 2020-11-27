@@ -59,14 +59,17 @@ func (sm *SiteManager) Init(d chromedp.Device, defTimeoutSec int64, headless boo
 	sm.cancel = append(sm.cancel, cancel)
 
 	// also set up a custom logger
-	ncCtx, tCancel := chromedp.NewContext(neaCtx, chromedp.WithLogf(log.Printf))
+	ctx, tCancel := chromedp.NewContext(neaCtx, chromedp.WithLogf(log.Printf))
 	sm.cancel = append(sm.cancel, tCancel)
 
-	// create a timeout
-	taskCtx, ttCancel := context.WithTimeout(ncCtx, time.Duration(defTimeoutSec)*time.Second)
-	sm.cancel = append(sm.cancel, ttCancel)
-
-	sm.ctx = taskCtx
+	if defTimeoutSec > 0 {
+		// create a timeout
+		taskCtx, ttCancel := context.WithTimeout(ctx, time.Duration(defTimeoutSec)*time.Second)
+		sm.cancel = append(sm.cancel, ttCancel)
+		sm.ctx = taskCtx
+	} else {
+		sm.ctx = ctx
+	}
 
 	sm.fixActions = append(sm.fixActions, chromedp.EmulateViewport(sm.info.Device().Width, sm.info.Device().Height))
 	sm.timeoutSec = defTimeoutSec
