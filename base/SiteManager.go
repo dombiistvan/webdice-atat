@@ -7,8 +7,8 @@ import (
 	"github.com/chromedp/cdproto/input"
 	"github.com/chromedp/chromedp"
 	"github.com/chromedp/chromedp/device"
-	"io/ioutil"
 	"log"
+	"os"
 	"reflect"
 	"time"
 )
@@ -123,8 +123,26 @@ func (sm *SiteManager) CreateScreenShot(filename string, timeoutSec int64, handl
 	action := chromedp.ActionFunc(func(ctx context.Context) error {
 		var p []byte
 		chromedp.CaptureScreenshot(&p)
-		err := ioutil.WriteFile(filename, p, 0755)
-		return err
+
+		f, err := os.OpenFile(filename, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, os.ModePerm)
+		if err != nil {
+			return err
+		}
+
+		_, err = f.Write(p)
+
+		if err != nil {
+			f.Close()
+			return err
+		}
+
+		err = f.Sync()
+		if err != nil {
+			f.Close()
+			return err
+		}
+
+		return f.Close()
 	})
 
 	if sm.activeGroup != "" {
