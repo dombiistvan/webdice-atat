@@ -92,7 +92,7 @@ func (sm *SiteManager) CreateScreenShot(filename string, timeoutSec int64, handl
 }
 
 func (sm *SiteManager) Cancel() {
-	for i := len(sm.cancel) - 1; i >= 0; i++ {
+	for i := len(sm.cancel) - 1; i >= 0; i-- {
 		sm.cancel[i]()
 	}
 }
