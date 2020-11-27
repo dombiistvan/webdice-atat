@@ -7,6 +7,7 @@ import (
 	"github.com/chromedp/cdproto/input"
 	"github.com/chromedp/chromedp"
 	"github.com/chromedp/chromedp/device"
+	"io/ioutil"
 	"log"
 	"os"
 	"reflect"
@@ -119,37 +120,41 @@ func (sm *SiteManager) GoToPath(url string, timoutSec int64, handleError bool) e
 	return err
 }
 
-func (sm *SiteManager) CreateScreenShot(filename string, timeoutSec int64, handleError bool) error {
-	action := chromedp.ActionFunc(func(ctx context.Context) error {
-		var p []byte
-		chromedp.CaptureScreenshot(&p)
-
-		f, err := os.OpenFile(filename, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, os.ModePerm)
-		if err != nil {
-			return err
-		}
-
-		_, err = f.Write(p)
-
-		if err != nil {
-			f.Close()
-			return err
-		}
-
-		err = f.Sync()
-		if err != nil {
-			f.Close()
-			return err
-		}
-
-		return f.Close()
-	})
-
+func (sm *SiteManager) CaptureScreenshotInto(contentInto *[]byte, timeoutSec int64, handleError bool) error {
+	action := chromedp.CaptureScreenshot(contentInto)
 	if sm.activeGroup != "" {
 		sm.groupActions[sm.activeGroup] = append(sm.groupActions[sm.activeGroup], action)
 		return nil
 	}
 	err := sm.DoTimeoutContext(timeoutSec, false, action)
+
+	sm.Error(err, handleError)
+	if err != nil {
+		return err
+	}
+
+	return err
+}
+
+func (sm *SiteManager) CreateScreenShot(filename string, timeoutSec int64, handleError bool) error {
+	action := chromedp.ActionFunc(func(ctx context.Context) error {
+		var p []byte
+		err := sm.CaptureScreenshotInto(&p, timeoutSec, handleError)
+		sm.Error(err, handleError)
+		err = ioutil.WriteFile(filename, p, os.ModePerm)
+		sm.Error(err, handleError)
+		return err
+	})
+	if sm.activeGroup != "" {
+		sm.groupActions[sm.activeGroup] = append(sm.groupActions[sm.activeGroup], action)
+		return nil
+	}
+	err := sm.DoTimeoutContext(timeoutSec, false, action)
+
+	sm.Error(err, handleError)
+	if err != nil {
+		return err
+	}
 
 	sm.Error(err, handleError)
 
